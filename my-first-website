@@ -1,0 +1,2393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>SoYam Connect</title>
+
+  <!-- Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #172033;
+      min-height: 100vh;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: auto;
+      min-height: 100vh;
+      background: #f5f7fb;
+      padding-bottom: 80px;
+    }
+
+    /* HEADER */
+
+    .header {
+      background: linear-gradient(135deg, #6c3df5, #8f5cff);
+      color: white;
+      padding: 22px 18px 25px;
+      border-radius: 0 0 25px 25px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 800;
+    }
+
+    .location {
+      font-size: 13px;
+      opacity: .9;
+      margin-top: 4px;
+    }
+
+    .profile {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .search {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 15px;
+      background: transparent;
+    }
+
+    /* CONTENT */
+
+    .content {
+      padding: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 13px;
+    }
+
+    .section-title h2 {
+      font-size: 18px;
+    }
+
+    .see-all {
+      color: #6c3df5;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    /* POST REQUEST */
+
+    .request-card {
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(20,20,50,.05);
+    }
+
+    .request-card h3 {
+      margin-bottom: 7px;
+      font-size: 17px;
+    }
+
+    .request-card p {
+      color: #697386;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: #6c3df5;
+      color: white;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    /* CATEGORIES */
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .category {
+      background: white;
+      border-radius: 15px;
+      padding: 13px 5px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(20,20,50,.04);
+    }
+
+    .category-icon {
+      font-size: 25px;
+      margin-bottom: 7px;
+    }
+
+    .category-name {
+      font-size: 11px;
+      color: #4e5969;
+    }
+
+    /* PROVIDERS */
+
+    .provider {
+      background: white;
+      padding: 15px;
+      border-radius: 17px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 13px;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(20,20,50,.04);
+    }
+
+    .provider-img {
+      width: 55px;
+      height: 55px;
+      border-radius: 15px;
+      background: #eee9ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 27px;
+    }
+
+    .provider-info {
+      flex: 1;
+    }
+
+    .provider-name {
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .provider-service {
+      color: #697386;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .rating {
+      color: #f59e0b;
+      font-size: 12px;
+    }
+
+    .near {
+      color: #6c3df5;
+      font-size: 11px;
+    }
+
+    /* REQUEST MODAL */
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 100;
+      align-items: flex-end;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 25px 25px 0 0;
+      padding: 22px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .close {
+      background: #f0f1f5;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin: 14px 0 7px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #e1e4eb;
+      border-radius: 11px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .location-btn {
+      margin-top: 8px;
+      width: 100%;
+      background: #f1edff;
+      color: #6c3df5;
+      padding: 12px;
+      border-radius: 11px;
+      font-weight: bold;
+    }
+
+    /* BOTTOM NAV */
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-top: 1px solid #e7e8ed;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
+      z-index: 50;
+    }
+
+    .nav-item {
+      background: transparent;
+      padding: 7px 2px;
+      color: #8a91a1;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .nav-item.active {
+      color: #6c3df5;
+      font-weight: bold;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* PAGES */
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: #777;
+    }
+
+    .empty-icon {
+      font-size: 45px;
+      margin-bottom: 15px;
+    }
+
+    /* TOAST */
+
+    .toast {
+      position: fixed;
+      bottom: 85px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #20232d;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: none;
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HOME PAGE -->
+  <div id="homePage" class="page active">
+
+    <div class="header">
+
+      <div class="top">
+
+        <div>
+          <div class="brand">SoYam Connect</div>
+          <div class="location">📍 Addis Ababa</div>
+        </div>
+
+        <div class="profile">👤</div>
+
+      </div>
+
+      <div class="search">
+        🔎
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="What service do you need?"
+          oninput="searchProviders()"
+        />
+      </div>
+
+    </div>
+
+    <div class="content">
+
+      <!-- REQUEST -->
+      <div class="request-card">
+
+        <h3>Need a service?</h3>
+
+        <p>
+          Tell us what you need and connect with available providers.
+        </p>
+
+        <button class="primary-btn" onclick="openRequest()">
+          + Post a Request
+        </button>
+
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="section-title">
+        <h2>Categories</h2>
+        <span class="see-all">See all</span>
+      </div>
+
+      <div class="categories">
+
+        <div class="category" onclick="filterCategory('Beauty')">
+          <div class="category-icon">💄</div>
+          <div class="category-name">Beauty</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Repair')">
+          <div class="category-icon">📱</div>
+          <div class="category-name">Repair</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Plumbing')">
+          <div class="category-icon">🔧</div>
+          <div class="category-name">Plumbing</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Tutor')">
+          <div class="category-icon">📚</div>
+          <div class="category-name">Tutors</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Cleaning')">
+          <div class="category-icon">🧹</div>
+          <div class="category-name">Cleaning</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Photography')">
+          <div class="category-icon">📸</div>
+          <div class="category-name">Photo</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Car')">
+          <div class="category-icon">🚗</div>
+          <div class="category-name">Auto</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('More')">
+          <div class="category-icon">•••</div>
+          <div class="category-name">More</div>
+        </div>
+
+      </div>
+
+      <!-- PROVIDERS -->
+
+      <div class="section-title">
+        <h2>Nearby Providers</h2>
+        <span class="see-all">View all</span>
+      </div>
+
+      <div id="providers">
+
+        <div class="provider" data-service="Beauty">
+
+          <div class="provider-img">💄</div>
+
+          <div class="provider-info">
+
+            <div class="provider-name">
+              Hana Beauty Studio
+            </div>
+
+            <div class="provider-service">
+              Makeup • Hair • Beauty
+            </div>
+
+            <div>
+              <span class="rating">⭐ 4.9</span>
+              <span class="near"> • 1.2 km</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="provider" data-service="Repair">
+
+          <div class="provider-img">📱</div>
+
+          <div class="provider-info">
+
+            <div class="provider-name">
+              Abel Phone Repair
+            </div>
+
+            <div class="provider-service">
+              Phone • Computer Repair
+            </div>
+
+            <div>
+              <span class="rating">⭐ 4.8</span>
+              <span class="near"> • 2.1 km</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="provider" data-service="Plumbing">
+
+          <div class="provider-img">🔧</div>
+
+          <div class="provider-info">
+
+            <div class="provider-name">
+              Tesfaye Plumbing
+            </div>
+
+            <div class="provider-service">
+              Plumbing • Water Systems
+            </div>
+
+            <div>
+              <span class="rating">⭐ 4.7</span>
+              <span class="near"> • 3.4 km</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="provider" data-service="Tutor">
+
+          <div class="provider-img">📚</div>
+
+          <div class="provider-info">
+
+            <div class="provider-name">
+              Bethlehem Tutor
+            </div>
+
+            <div class="provider-service">
+              Mathematics • English
+            </div>
+
+            <div>
+              <span class="rating">⭐ 5.0</span>
+              <span class="near"> • 1.8 km</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- REQUESTS PAGE -->
+
+  <div id="requestsPage" class="page">
+
+    <div class="header">
+
+      <div class="top">
+
+        <div>
+          <div class="brand">My Requests</div>
+          <div class="location">Track your service requests</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="content">
+
+      <div class="empty">
+
+        <div class="empty-icon">📋</div>
+
+        <h3>No requests yet</h3>
+
+        <p style="margin:10px 0 20px;">
+          Post your first request and let providers contact you.
+        </p>
+
+        <button class="primary-btn" onclick="openRequest()">
+          + Post Request
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PROVIDER PAGE -->
+
+  <div id="providerPage" class="page">
+
+    <div class="header">
+
+      <div class="top">
+
+        <div>
+          <div class="brand">Provider Center</div>
+          <div class="location">Offer your services</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="content">
+
+      <div class="request-card">
+
+        <h3>Are you a service provider?</h3>
+
+        <p>
+          Create your provider profile and start receiving customers.
+        </p>
+
+        <button class="primary-btn"
+                onclick="showToast('Provider registration coming next')">
+          Become a Provider
+        </button>
+
+      </div>
+
+      <div class="section-title">
+        <h2>Provider Benefits</h2>
+      </div>
+
+      <div class="provider">
+        <div class="provider-img">📢</div>
+        <div class="provider-info">
+          <div class="provider-name">Get New Customers</div>
+          <div class="provider-service">
+            Receive requests from people near you.
+          </div>
+        </div>
+      </div>
+
+      <div class="provider">
+        <div class="provider-img">⭐</div>
+        <div class="provider-info">
+          <div class="provider-name">Build Your Reputation</div>
+          <div class="provider-service">
+            Collect ratings and reviews.
+          </div>
+        </div>
+      </div>
+
+      <div class="provider">
+        <div class="provider-img">📈</div>
+        <div class="provider-info">
+          <div class="provider-name">Grow Your Business</div>
+          <div class="provider-service">
+            Promote your services to more customers.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PROFILE PAGE -->
+
+  <div id="profilePage" class="page">
+
+    <div class="header">
+
+      <div class="top">
+
+        <div>
+          <div class="brand">My Profile</div>
+          <div class="location">SoYam Connect account</div>
+        </div>
+
+        <div class="profile">👤</div>
+
+      </div>
+
+    </div>
+
+    <div class="content">
+
+      <div class="request-card">
+
+        <h3 id="telegramName">
+          Telegram User
+        </h3>
+
+        <p>
+          Your Telegram account is connected to SoYam Connect.
+        </p>
+
+      </div>
+
+      <div class="request-card">
+
+        <h3>⚙️ Settings</h3>
+
+        <p style="margin-top:10px;">
+          Notifications
+        </p>
+
+        <p style="margin-top:15px;">
+          Language
+        </p>
+
+        <p style="margin-top:15px;">
+          Location
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- BOTTOM NAV -->
+
+  <div class="bottom-nav">
+
+    <button class="nav-item active"
+            onclick="showPage('homePage', this)">
+      <span class="nav-icon">🏠</span>
+      Home
+    </button>
+
+    <button class="nav-item"
+            onclick="showPage('requestsPage', this)">
+      <span class="nav-icon">📋</span>
+      Requests
+    </button>
+
+    <button class="nav-item"
+            onclick="showPage('providerPage', this)">
+      <span class="nav-icon">💼</span>
+      Provider
+    </button>
+
+    <button class="nav-item"
+            onclick="showPage('profilePage', this)">
+      <span class="nav-icon">👤</span>
+      Profile
+    </button>
+
+  </div>
+
+
+  <!-- REQUEST MODAL -->
+
+  <div id="requestModal" class="modal">
+
+    <div class="modal-box">
+
+      <div class="modal-header">
+
+        <h2>Post a Request</h2>
+
+        <button class="close" onclick="closeRequest()">
+          ×
+        </button>
+
+      </div>
+
+      <label>What service do you need?</label>
+
+      <select id="service">
+
+        <option value="">Select service</option>
+        <option>Beauty</option>
+        <option>Phone Repair</option>
+        <option>Plumbing</option>
+        <option>Tutor</option>
+        <option>Cleaning</option>
+        <option>Photography</option>
+        <option>Car Repair</option>
+        <option>Delivery</option>
+        <option>Other</option>
+
+      </select>
+
+
+      <label>Describe what you need</label>
+
+      <textarea
+        id="description"
+        placeholder="Example: I need a plumber to fix a leaking water pipe..."
+      ></textarea>
+
+
+      <label>Your location</label>
+
+      <input
+        id="location"
+        type="text"
+        placeholder="Example: Bole, Addis Ababa"
+      />
+
+      <button class="location-btn"
+              onclick="getLocation()">
+        📍 Use My Current Location
+      </button>
+
+
+      <label>Budget (optional)</label>
+
+      <input
+        id="budget"
+        type="number"
+        placeholder="ETB"
+      />
+
+
+      <div style="height:18px;"></div>
+
+      <button class="primary-btn"
+              onclick="submitRequest()">
+        Publish Request
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- TOAST -->
+
+  <div id="toast" class="toast"></div>
+
+</div>
+
+
+<script>
+
+  /* TELEGRAM */
+
+  const tg = window.Telegram.WebApp;
+
+  tg.ready();
+
+  tg.expand();
+
+  /*
+    Use Telegram theme when available.
+  */
+
+  if (tg.colorScheme === "dark") {
+    document.body.classList.add("telegram-dark");
+  }
+
+
+  /* USER */
+
+  if (tg.initDataUnsafe &&
+      tg.initDataUnsafe.user) {
+
+    const user = tg.initDataUnsafe.user;
+
+    const name =
+      user.first_name ||
+      user.username ||
+      "Telegram User";
+
+    document.getElementById("telegramName").textContent =
+      name;
+  }
+
+
+  /* NAVIGATION */
+
+  function showPage(pageId, button) {
+
+    document.querySelectorAll(".page")
+      .forEach(page => {
+        page.classList.remove("active");
+      });
+
+    document.getElementById(pageId)
+      .classList.add("active");
+
+    document.querySelectorAll(".nav-item")
+      .forEach(item => {
+        item.classList.remove("active");
+      });
+
+    if (button) {
+      button.classList.add("active");
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  /* REQUEST MODAL */
+
+  function openRequest() {
+
+    document
+      .getElementById("requestModal")
+      .classList.add("active");
+
+  }
+
+
+  function closeRequest() {
+
+    document
+      .getElementById("requestModal")
+      .classList.remove("active");
+
+  }
+
+
+  /* LOCATION */
+
+  function getLocation() {
+
+    if (!navigator.geolocation) {
+
+      showToast("Location is not supported.");
+
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+      function(position) {
+
+        const lat =
+          position.coords.latitude;
+
+        const lng =
+          position.coords.longitude;
+
+        document.getElementById("location").value =
+          lat.toFixed(6) + ", " +
+          lng.toFixed(6);
+
+        showToast("Location added.");
+
+      },
+
+      function() {
+
+        showToast(
+          "Please allow location access."
+        );
+
+      }
+
+    );
+
+  }
+
+
+  /* SUBMIT REQUEST */
+
+  function submitRequest() {
+
+    const service =
+      document.getElementById("service").value;
+
+    const description =
+      document.getElementById("description").value;
+
+    const location =
+      document.getElementById("location").value;
+
+    const budget =
+      document.getElementById("budget").value;
+
+
+    if (!service) {
+
+      showToast(
+        "Please select a service."
+      );
+
+      return;
+    }
+
+
+    if (!description.trim()) {
+
+      showToast(
+        "Please describe what you need."
+      );
+
+      return;
+    }
+
+
+    /*
+      Prototype only.
+
+      Later this data will be sent
+      to the backend/database.
+    */
+
+    const request = {
+
+      service: service,
+
+      description: description,
+
+      location: location,
+
+      budget: budget,
+
+      telegram_user:
+        tg.initDataUnsafe?.user || null,
+
+      created_at:
+        new Date().toISOString()
+
+    };
+
+
+    console.log(
+      "REQUEST:",
+      request
+    );
+
+
+    closeRequest();
+
+
+    showToast(
+      "Request published successfully!"
+    );
+
+
+    /*
+      Telegram bot can receive this
+      later through the backend.
+    */
+
+  }
+
+
+  /* SEARCH */
+
+  function searchProviders() {
+
+    const search =
+      document.getElementById("searchInput")
+      .value
+      .toLowerCase();
+
+    const providers =
+      document.querySelectorAll(".provider");
+
+
+    providers.forEach(provider => {
+
+      const text =
+        provider.innerText.toLowerCase();
+
+      provider.style.display =
+        text.includes(search)
+          ? "flex"
+          : "none";
+
+    });
+
+  }
+
+
+  /* CATEGORY FILTER */
+
+  function filterCategory(category) {
+
+    const providers =
+      document.querySelectorAll(".provider");
+
+
+    providers.forEach(provider => {
+
+      const service =
+        provider.dataset.service;
+
+      if (
+        category === "More" ||
+        service === category
+      ) {
+
+        provider.style.display = "flex";
+
+      } else {
+
+        provider.style.display = "none";
+
+      }
+
+    });
+
+
+    showToast(
+      category === "More"
+        ? "Showing all services"
+        : category + " services"
+    );
+
+  }
+
+
+  /* TOAST */
+
+  function showToast(message) {
+
+    const toast =
+      document.getElementById("toast");
+
+    toast.textContent =
+      message;
+
+    toast.classList.add("show");
+
+
+    setTimeout(() => {
+
+      toast.classList.remove("show");
+
+    }, 2500);
+
+  }
+
+
+  /* TELEGRAM MAIN BUTTON */
+
+  /*
+    We intentionally don't use the
+    Telegram MainButton yet because
+    the prototype has its own buttons.
+  */
+
+
+  /* CLOSE MODAL WHEN BACKGROUND CLICKED */
+
+  document
+    .getElementById("requestModal")
+    .addEventListener("click", function(e) {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>SoYam Connect</title>
+
+  <!-- Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #172033;
+      min-height: 100vh;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: auto;
+      min-height: 100vh;
+      background: #f5f7fb;
+      padding-bottom: 80px;
+    }
+
+    /* HEADER */
+
+    .header {
+      background: linear-gradient(135deg, #6c3df5, #8f5cff);
+      color: white;
+      padding: 22px 18px 25px;
+      border-radius: 0 0 25px 25px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 800;
+    }
+
+    .location {
+      font-size: 13px;
+      opacity: .9;
+      margin-top: 4px;
+    }
+
+    .profile {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .search {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 15px;
+      background: transparent;
+    }
+
+    /* CONTENT */
+
+    .content {
+      padding: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 13px;
+    }
+
+    .section-title h2 {
+      font-size: 18px;
+    }
+
+    .see-all {
+      color: #6c3df5;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    /* POST REQUEST */
+
+    .request-card {
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(20,20,50,.05);
+    }
+
+    .request-card h3 {
+      margin-bottom: 7px;
+      font-size: 17px;
+    }
+
+    .request-card p {
+      color: #697386;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: #6c3df5;
+      color: white;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    /* CATEGORIES */
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .category {
+      background: white;
+      border-radius: 15px;
+      padding: 13px 5px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(20,20,50,.04);
+    }
+
+    .category-icon {
+      font-size: 25px;
+      margin-bottom: 7px;
+    }
+
+    .category-name {
+      font-size: 11px;
+      color: #4e5969;
+    }
+
+    /* PROVIDERS */
+
+    .provider {
+      background: white;
+      padding: 15px;
+      border-radius: 17px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 13px;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(20,20,50,.04);
+    }
+
+    .provider-img {
+      width: 55px;
+      height: 55px;
+      border-radius: 15px;
+      background: #eee9ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 27px;
+    }
+
+    .provider-info {
+      flex: 1;
+    }
+
+    .provider-name {
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .provider-service {
+      color: #697386;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .rating {
+      color: #f59e0b;
+      font-size: 12px;
+    }
+
+    .near {
+      color: #6c3df5;
+      font-size: 11px;
+    }
+
+    /* REQUEST MODAL */
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 100;
+      align-items: flex-end;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 25px 25px 0 0;
+      padding: 22px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .close {
+      background: #f0f1f5;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin: 14px 0 7px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #e1e4eb;
+      border-radius: 11px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .location-btn {
+      margin-top: 8px;
+      width: 100%;
+      background: #f1edff;
+      color: #6c3df5;
+      padding: 12px;
+      border-radius: 11px;
+      font-weight: bold;
+    }
+
+    /* BOTTOM NAV */
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-top: 1px solid #e7e8ed;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
+      z-index: 50;
+    }
+
+    .nav-item {
+      background: transparent;
+      padding: 7px 2px;
+      color: #8a91a1;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .nav-item.active {
+      color: #6c3df5;
+      font-weight: bold;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* PAGES */
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: #777;
+    }
+
+    .empty-icon {
+      font-size: 45px;
+      margin-bottom: 15px;
+    }
+
+    /* TOAST */
+
+    .toast {
+      position: fixed;
+      bottom: 85px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #20232d;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: none;
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HOME PAGE -->
+  <div id="homePage" class="page active">
+
+    <div class="header">
+
+      <div class="top">
+
+        <div>
+          <div class="brand">SoYam Connect</div>
+          <div class="location">📍 Addis Ababa</div>
+        </div>
+
+        <div class="profile">👤</div>
+
+      </div>
+
+      <div class="search">
+        🔎
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="What service do you need?"
+          oninput="searchProviders()"
+        />
+      </div>
+
+    </div>
+
+    <div class="content">
+
+      <!-- REQUEST -->
+      <div class="request-card">
+
+        <h3>Need a service?</h3>
+
+        <p>
+          Tell us what you need and connect with available providers.
+        </p>
+
+        <button class="primary-btn" onclick="openRequest()">
+          + Post a Request
+        </button>
+
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="section-title">
+        <h2>Categories</h2>
+        <span class="see-all">See all</span>
+      </div>
+
+      <div class="categories">
+
+        <div class="category" onclick="filterCategory('Beauty')">
+          <div class="category-icon">💄</div>
+          <div class="category-name">Beauty</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Repair')">
+          <div class="category-icon">📱</div>
+          <div class="category-name">Repair</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Plumbing')">
+          <div class="category-icon">🔧</div>
+          <div class="category-name">Plumbing</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Tutor')">
+          <div class="category-icon">📚</div>
+          <div class="category-name">Tutors</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Cleaning')">
+          <div class="category-icon">🧹</div>
+          <div class="category-name">Cleaning</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Photography')">
+          <div class="category-icon">📸</div>
+          <div class="category-name">Photo</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('Car')">
+          <div class="category-icon">🚗</div>
+          <div class="category-name">Auto</div>
+        </div>
+
+        <div class="category" onclick="filterCategory('More')">
+          <div class="category-icon">•••</div>
+          <div class="category-name">More</div>
+        </div>
+
+      </div>
+
+      <!-- PROVIDERS -->
+
+      <div class="section-title">
+        <h2>Nearby Providers</h2>
+        <span class="see-all">View all</span>
+      </div>
+
+      <div id="providers">
+
+        <div class="provider" data-service="Beauty">
+
+          <div class="provider-img">💄</div>
+
+          <div class="provider-info">
+
+            <div class="provider-name">
+              Hana Beauty Studio
+            </div>
+
+            <div class="provider-service">
+              Makeup • Hair • Beauty
+            </div>
+
+            <div>
+              <span class="rating">⭐ 4.9</span>
+              <span class="near"> • 1.2 km</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="provider" data-service="Repair">
+
+          <div class="provider-img">📱</div>
+
+          <div class="provider-info">
+
+            <div class="provider-name">
+              Abel Phone Repair
+            </div>
+
+            <div class="provider-service">
+              Phone • Computer Repair
+            </div>
+
+            <div>
+              <span class="rating">⭐ 4.8</span>
+              <span class="near"> • 2.1 km</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="provider" data-service="Plumbing">
+
+          <div class="provider-img">🔧</div>
+
+          <div class="provider-info">
+
+            <div class="provider-name">
+              Tesfaye Plumbing
+            </div>
+
+            <div class="provider-service">
+              Plumbing • Water Systems
+            </div>
+
+            <div>
+              <span class="rating">⭐ 4.7</span>
+              <span class="near"> • 3.4 km</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="provider" data-service="Tutor">
+
+          <div class="provider-img">📚</div>
+
+          <div class="provider-info">
+
+            <div class="provider-name">
+              Bethlehem Tutor
+            </div>
+
+            <div class="provider-service">
+              Mathematics • English
+            </div>
+
+            <div>
+              <span class="rating">⭐ 5.0</span>
+              <span class="near"> • 1.8 km</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- REQUESTS PAGE -->
+
+  <div id="requestsPage" class="page">
+
+    <div class="header">
+
+      <div class="top">
+
+        <div>
+          <div class="brand">My Requests</div>
+          <div class="location">Track your service requests</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="content">
+
+      <div class="empty">
+
+        <div class="empty-icon">📋</div>
+
+        <h3>No requests yet</h3>
+
+        <p style="margin:10px 0 20px;">
+          Post your first request and let providers contact you.
+        </p>
+
+        <button class="primary-btn" onclick="openRequest()">
+          + Post Request
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PROVIDER PAGE -->
+
+  <div id="providerPage" class="page">
+
+    <div class="header">
+
+      <div class="top">
+
+        <div>
+          <div class="brand">Provider Center</div>
+          <div class="location">Offer your services</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="content">
+
+      <div class="request-card">
+
+        <h3>Are you a service provider?</h3>
+
+        <p>
+          Create your provider profile and start receiving customers.
+        </p>
+
+        <button class="primary-btn"
+                onclick="showToast('Provider registration coming next')">
+          Become a Provider
+        </button>
+
+      </div>
+
+      <div class="section-title">
+        <h2>Provider Benefits</h2>
+      </div>
+
+      <div class="provider">
+        <div class="provider-img">📢</div>
+        <div class="provider-info">
+          <div class="provider-name">Get New Customers</div>
+          <div class="provider-service">
+            Receive requests from people near you.
+          </div>
+        </div>
+      </div>
+
+      <div class="provider">
+        <div class="provider-img">⭐</div>
+        <div class="provider-info">
+          <div class="provider-name">Build Your Reputation</div>
+          <div class="provider-service">
+            Collect ratings and reviews.
+          </div>
+        </div>
+      </div>
+
+      <div class="provider">
+        <div class="provider-img">📈</div>
+        <div class="provider-info">
+          <div class="provider-name">Grow Your Business</div>
+          <div class="provider-service">
+            Promote your services to more customers.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PROFILE PAGE -->
+
+  <div id="profilePage" class="page">
+
+    <div class="header">
+
+      <div class="top">
+
+        <div>
+          <div class="brand">My Profile</div>
+          <div class="location">SoYam Connect account</div>
+        </div>
+
+        <div class="profile">👤</div>
+
+      </div>
+
+    </div>
+
+    <div class="content">
+
+      <div class="request-card">
+
+        <h3 id="telegramName">
+          Telegram User
+        </h3>
+
+        <p>
+          Your Telegram account is connected to SoYam Connect.
+        </p>
+
+      </div>
+
+      <div class="request-card">
+
+        <h3>⚙️ Settings</h3>
+
+        <p style="margin-top:10px;">
+          Notifications
+        </p>
+
+        <p style="margin-top:15px;">
+          Language
+        </p>
+
+        <p style="margin-top:15px;">
+          Location
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- BOTTOM NAV -->
+
+  <div class="bottom-nav">
+
+    <button class="nav-item active"
+            onclick="showPage('homePage', this)">
+      <span class="nav-icon">🏠</span>
+      Home
+    </button>
+
+    <button class="nav-item"
+            onclick="showPage('requestsPage', this)">
+      <span class="nav-icon">📋</span>
+      Requests
+    </button>
+
+    <button class="nav-item"
+            onclick="showPage('providerPage', this)">
+      <span class="nav-icon">💼</span>
+      Provider
+    </button>
+
+    <button class="nav-item"
+            onclick="showPage('profilePage', this)">
+      <span class="nav-icon">👤</span>
+      Profile
+    </button>
+
+  </div>
+
+
+  <!-- REQUEST MODAL -->
+
+  <div id="requestModal" class="modal">
+
+    <div class="modal-box">
+
+      <div class="modal-header">
+
+        <h2>Post a Request</h2>
+
+        <button class="close" onclick="closeRequest()">
+          ×
+        </button>
+
+      </div>
+
+      <label>What service do you need?</label>
+
+      <select id="service">
+
+        <option value="">Select service</option>
+        <option>Beauty</option>
+        <option>Phone Repair</option>
+        <option>Plumbing</option>
+        <option>Tutor</option>
+        <option>Cleaning</option>
+        <option>Photography</option>
+        <option>Car Repair</option>
+        <option>Delivery</option>
+        <option>Other</option>
+
+      </select>
+
+
+      <label>Describe what you need</label>
+
+      <textarea
+        id="description"
+        placeholder="Example: I need a plumber to fix a leaking water pipe..."
+      ></textarea>
+
+
+      <label>Your location</label>
+
+      <input
+        id="location"
+        type="text"
+        placeholder="Example: Bole, Addis Ababa"
+      />
+
+      <button class="location-btn"
+              onclick="getLocation()">
+        📍 Use My Current Location
+      </button>
+
+
+      <label>Budget (optional)</label>
+
+      <input
+        id="budget"
+        type="number"
+        placeholder="ETB"
+      />
+
+
+      <div style="height:18px;"></div>
+
+      <button class="primary-btn"
+              onclick="submitRequest()">
+        Publish Request
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- TOAST -->
+
+  <div id="toast" class="toast"></div>
+
+</div>
+
+
+<script>
+
+  /* TELEGRAM */
+
+  const tg = window.Telegram.WebApp;
+
+  tg.ready();
+
+  tg.expand();
+
+  /*
+    Use Telegram theme when available.
+  */
+
+  if (tg.colorScheme === "dark") {
+    document.body.classList.add("telegram-dark");
+  }
+
+
+  /* USER */
+
+  if (tg.initDataUnsafe &&
+      tg.initDataUnsafe.user) {
+
+    const user = tg.initDataUnsafe.user;
+
+    const name =
+      user.first_name ||
+      user.username ||
+      "Telegram User";
+
+    document.getElementById("telegramName").textContent =
+      name;
+  }
+
+
+  /* NAVIGATION */
+
+  function showPage(pageId, button) {
+
+    document.querySelectorAll(".page")
+      .forEach(page => {
+        page.classList.remove("active");
+      });
+
+    document.getElementById(pageId)
+      .classList.add("active");
+
+    document.querySelectorAll(".nav-item")
+      .forEach(item => {
+        item.classList.remove("active");
+      });
+
+    if (button) {
+      button.classList.add("active");
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  /* REQUEST MODAL */
+
+  function openRequest() {
+
+    document
+      .getElementById("requestModal")
+      .classList.add("active");
+
+  }
+
+
+  function closeRequest() {
+
+    document
+      .getElementById("requestModal")
+      .classList.remove("active");
+
+  }
+
+
+  /* LOCATION */
+
+  function getLocation() {
+
+    if (!navigator.geolocation) {
+
+      showToast("Location is not supported.");
+
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+      function(position) {
+
+        const lat =
+          position.coords.latitude;
+
+        const lng =
+          position.coords.longitude;
+
+        document.getElementById("location").value =
+          lat.toFixed(6) + ", " +
+          lng.toFixed(6);
+
+        showToast("Location added.");
+
+      },
+
+      function() {
+
+        showToast(
+          "Please allow location access."
+        );
+
+      }
+
+    );
+
+  }
+
+
+  /* SUBMIT REQUEST */
+
+  function submitRequest() {
+
+    const service =
+      document.getElementById("service").value;
+
+    const description =
+      document.getElementById("description").value;
+
+    const location =
+      document.getElementById("location").value;
+
+    const budget =
+      document.getElementById("budget").value;
+
+
+    if (!service) {
+
+      showToast(
+        "Please select a service."
+      );
+
+      return;
+    }
+
+
+    if (!description.trim()) {
+
+      showToast(
+        "Please describe what you need."
+      );
+
+      return;
+    }
+
+
+    /*
+      Prototype only.
+
+      Later this data will be sent
+      to the backend/database.
+    */
+
+    const request = {
+
+      service: service,
+
+      description: description,
+
+      location: location,
+
+      budget: budget,
+
+      telegram_user:
+        tg.initDataUnsafe?.user || null,
+
+      created_at:
+        new Date().toISOString()
+
+    };
+
+
+    console.log(
+      "REQUEST:",
+      request
+    );
+
+
+    closeRequest();
+
+
+    showToast(
+      "Request published successfully!"
+    );
+
+
+    /*
+      Telegram bot can receive this
+      later through the backend.
+    */
+
+  }
+
+
+  /* SEARCH */
+
+  function searchProviders() {
+
+    const search =
+      document.getElementById("searchInput")
+      .value
+      .toLowerCase();
+
+    const providers =
+      document.querySelectorAll(".provider");
+
+
+    providers.forEach(provider => {
+
+      const text =
+        provider.innerText.toLowerCase();
+
+      provider.style.display =
+        text.includes(search)
+          ? "flex"
+          : "none";
+
+    });
+
+  }
+
+
+  /* CATEGORY FILTER */
+
+  function filterCategory(category) {
+
+    const providers =
+      document.querySelectorAll(".provider");
+
+
+    providers.forEach(provider => {
+
+      const service =
+        provider.dataset.service;
+
+      if (
+        category === "More" ||
+        service === category
+      ) {
+
+        provider.style.display = "flex";
+
+      } else {
+
+        provider.style.display = "none";
+
+      }
+
+    });
+
+
+    showToast(
+      category === "More"
+        ? "Showing all services"
+        : category + " services"
+    );
+
+  }
+
+
+  /* TOAST */
+
+  function showToast(message) {
+
+    const toast =
+      document.getElementById("toast");
+
+    toast.textContent =
+      message;
+
+    toast.classList.add("show");
+
+
+    setTimeout(() => {
+
+      toast.classList.remove("show");
+
+    }, 2500);
+
+  }
+
+
+  /* TELEGRAM MAIN BUTTON */
+
+  /*
+    We intentionally don't use the
+    Telegram MainButton yet because
+    the prototype has its own buttons.
+  */
+
+
+  /* CLOSE MODAL WHEN BACKGROUND CLICKED */
+
+  document
+    .getElementById("requestModal")
+    .addEventListener("click", function(e) {
+
+      if (e.target === this) {
+
+        closeRequest();
+
+      }
+
+    });
+
+</script>
+
+</body>
+</html>
+      if (e.target === this) {
+
+        closeRequest();
+
+      }
+
+    });
+
+</script>
+
+</body>
+</html>
